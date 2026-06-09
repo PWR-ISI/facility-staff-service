@@ -18,6 +18,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware', 'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'common.auth.JWTStubMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -52,3 +53,16 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {'ACCESS_TOKEN_LIFETIME': timedelta(hours=1), 'ALGORITHM': 'HS256', 'SIGNING_KEY': SECRET_KEY}
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
+CORS_ALLOW_ALL_ORIGINS = True
+
+# ── AWS / LocalStack (S3 for doctor photos) ───────────────────────────────────
+# All AWS calls go through common.aws.aws_client() which injects endpoint_url
+# from AWS_ENDPOINT_URL, so traffic hits the local emulation, never real AWS.
+AWS_REGION = os.getenv('AWS_REGION', 'us-east-1')
+AWS_ENDPOINT_URL = os.getenv('AWS_ENDPOINT_URL') or None
+STAFF_PHOTO_BUCKET = os.getenv('STAFF_PHOTO_BUCKET', 'isi-files')
+# Host-reachable base used to build browser-renderable photo URLs.
+S3_PUBLIC_URL = os.getenv('S3_PUBLIC_URL', 'http://localhost:4566')
+
+# Shared secret for trusted inter-service calls (X-Internal-Token).
+INTERNAL_SHARED_TOKEN = os.getenv('INTERNAL_SHARED_TOKEN', 'dev-internal-token')

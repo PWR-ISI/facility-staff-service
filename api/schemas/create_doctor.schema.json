@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CreateDoctor",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["user_id", "email", "first_name", "last_name", "specialization", "facility_id"],
+  "properties": {
+    "user_id": { "type": "string", "minLength": 1, "maxLength": 255 },
+    "email": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 254,
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+    },
+    "first_name": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "last_name": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "specialization": { "type": "string", "minLength": 2, "maxLength": 100 },
+    "license_number": { "type": "string", "maxLength": 100 },
+    "facility_id": { "type": ["integer", "string"], "pattern": "^[0-9]+$" }
+  }
+}
