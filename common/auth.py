@@ -64,3 +64,9 @@ class _HasRole(BasePermission):
 class IsAdmin(_HasRole):
     message = "Administrator role required."
     required_roles = ("admin",)
+
+
+class IsAdminOrStaff(_HasRole):
+    """Admin or front-desk clerk (the SPA uses 'staff'; BPMN calls it receptionist)."""
+    message = "Administrator or staff role required."
+    required_roles = ("admin", "staff", "receptionist")

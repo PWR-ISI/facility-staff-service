@@ -14,7 +14,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiRespon
 from .models import Facility, FacilityStaff, Doctor, AuditLog
 from .serializers import FacilitySerializer, FacilityStaffSerializer, DoctorSerializer
 from .s3_utils import upload_staff_photo
-from common.auth import IsAuthenticated, IsAdmin
+from common.auth import IsAuthenticated, IsAdmin, IsAdminOrStaff
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +71,8 @@ class DoctorViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ('list', 'retrieve'):
             return [IsAuthenticated()]
-        return [IsAdmin()]
+        # Admin or front-desk clerk may register doctors (DoctorRegistrationClerk).
+        return [IsAdminOrStaff()]
 
     def get_queryset(self):
         qs = Doctor.objects.filter(is_active=True)
