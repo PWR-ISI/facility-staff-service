@@ -28,9 +28,14 @@ TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates', 'DIR
                           'django.contrib.messages.context_processors.messages']}}]
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# Use PostgreSQL (RDS) whenever a DB host is provided (the ECS task def sets DB_HOST);
+# otherwise fall back to SQLite for local dev. Previously postgres required
+# DB_ENGINE=postgresql, which the ECS task def never set — so the catalog ran on ephemeral
+# SQLite and was wiped on every redeploy.
+_USE_POSTGRES = os.getenv('DB_ENGINE') == 'postgresql' or bool(os.getenv('DB_HOST'))
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql' if os.getenv('DB_ENGINE') == 'postgresql' else 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql' if _USE_POSTGRES else 'django.db.backends.sqlite3',
         'NAME': os.getenv('DB_NAME', 'facility_db'),
         'USER': os.getenv('DB_USER', 'postgres'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
@@ -38,7 +43,7 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
-if os.getenv('DB_ENGINE') != 'postgresql':
+if not _USE_POSTGRES:
     DATABASES['default']['NAME'] = BASE_DIR / 'db.sqlite3'
 
 LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_TZ = 'en-us', 'UTC', True, True
